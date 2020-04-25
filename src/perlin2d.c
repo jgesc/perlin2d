@@ -1,4 +1,5 @@
 #include "perlin2d.h"
+#include <stdio.h>
 
 int perlin2d(float * grid, size_t height, size_t width, unsigned int t, float a, unsigned int seed)
 {
@@ -16,8 +17,8 @@ int perlin2d(float * grid, size_t height, size_t width, unsigned int t, float a,
   for(i = 0; i < vgridxl * vgridyl * 2; i += 2)
   {
     // Generate random unitary 2D vector
-    float x = rand() / RAND_MAX;
-    float y = rand() / RAND_MAX;
+    float x = (float)rand() / RAND_MAX;
+    float y = (float)rand() / RAND_MAX;
     float xn = NORM(x, y);
     float yn = NORM(y, x);
 
@@ -44,6 +45,8 @@ int perlin2d(float * grid, size_t height, size_t width, unsigned int t, float a,
       float vec3[2] = {NORM(t - u, t - v), NORM(t - v, t - u)};
       float vec4[2] = {NORM(y, t - v), NORM(t - v, y)};
 
+      printf("%f\n", vec2[0]);
+
       // Calculate dot products
       float dots[4] =
       {
@@ -59,7 +62,7 @@ int perlin2d(float * grid, size_t height, size_t width, unsigned int t, float a,
       float val = LERP(a, b, v / t);
 
       // Store result
-      grid[i * width + j] = val;
+      grid[i * width + j] = val * a;
     }
   }
 
