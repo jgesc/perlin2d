@@ -1,6 +1,8 @@
 #include "perlin2d.h"
 #include <stdio.h>
 
+const float SQRT2 = sqrt(2);
+
 int perlin2d(float * grid, size_t height, size_t width, unsigned int t, float a, unsigned int seed)
 {
   int i, j; // Iterator variables
@@ -17,11 +19,8 @@ int perlin2d(float * grid, size_t height, size_t width, unsigned int t, float a,
   for(i = 0; i < vgridxl * vgridyl * 2; i += 2)
   {
     // Generate random unitary 2D vector
-    // float x = (float)rand() / RAND_MAX * 2 - 1;
-    // float y = (float)rand() / RAND_MAX * 2 - 1;
-
-    float x = (float)rand() / RAND_MAX;
-    float y = (float)rand() / RAND_MAX;
+    float x = ((float)rand() / RAND_MAX) * 2 - 1;
+    float y = ((float)rand() / RAND_MAX) * 2 - 1;
     float xn = NORM(x, y);
     float yn = NORM(y, x);
 
@@ -43,10 +42,11 @@ int perlin2d(float * grid, size_t height, size_t width, unsigned int t, float a,
       float v = i % t + 1;
 
       // Calculate corner-point vectors (clockwise order)
-      float vec1[2] = {u / t, v / t};
-      float vec2[2] = {-(t - u) / t, v / t};
-      float vec3[2] = {-(t - u) / t, -(t - v) / t};
-      float vec4[2] = {u / t, -(t - v) / t};
+      float d = SQRT2; // Normalize
+      float vec1[2] = {u / t / d, v / t / d};
+      float vec2[2] = {-(t - u) / t / d, v / t / d};
+      float vec3[2] = {-(t - u) / t / d, -(t - v) / t / d};
+      float vec4[2] = {u / t / d, -(t - v) / t / d};
 
       // Calculate dot products
       float dots[4] =
@@ -58,36 +58,12 @@ int perlin2d(float * grid, size_t height, size_t width, unsigned int t, float a,
       };
 
       // Interpolate
-      float avgt = LERP(dots[0], dots[1], (u - 1) / (t - 1));
-      float avgb = LERP(dots[3], dots[2], (u - 1) / (t - 1));
-      float val = LERP(avgt, avgb, (v - 1) / (t - 1));
+      float avgt = LERP(dots[0], dots[1], SMOOTH((u - 1) / (t - 1)));
+      float avgb = LERP(dots[3], dots[2], SMOOTH((u - 1) / (t - 1)));
+      float val = LERP(avgt, avgb, SMOOTH((v - 1) / (t - 1)));
 
-    //   float val;
-    //   if(u <= t / 2)
-    //   {
-    //     if(v <= t / 2)
-    //     {
-    //       val = dots[0];
-    //     }
-    //     else
-    //     {
-    //       val = dots[3];
-    //     }
-    //   }
-    //   else
-    //   {
-    //     if(v <= t / 2)
-    //     {
-    //       val = dots[1];
-    //     }
-    //     else
-    //     {
-    //       val = dots[2];
-    //     }
-    //   }
-    //
       // Store result
-      grid[i * width + j] = val * a;
+      grid[i * width + j] = (val + 0.5) * a;
     }
   }
 
