@@ -1,5 +1,4 @@
 #include "perlin2d.h"
-#include <stdio.h>
 
 const float SQRT2 = sqrt(2);
 
