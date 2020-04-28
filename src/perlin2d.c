@@ -42,11 +42,11 @@ int perlin2d(float * grid, size_t height, size_t width, unsigned int t, float a,
       float v = i % t + 1;
 
       // Calculate corner-point vectors (clockwise order)
-      float d = SQRT2; // Normalize
-      float vec1[2] = {u / t / d, v / t / d};
-      float vec2[2] = {-(t - u) / t / d, v / t / d};
-      float vec3[2] = {-(t - u) / t / d, -(t - v) / t / d};
-      float vec4[2] = {u / t / d, -(t - v) / t / d};
+      float d = t / SQRT2;
+      float vec1[2] = {u / d, v / d};
+      float vec2[2] = {-(t - u) / d, v / d};
+      float vec3[2] = {-(t - u) / d, -(t - v) / d};
+      float vec4[2] = {u / d, -(t - v) / d};
 
       // Calculate dot products
       float dots[4] =
@@ -57,7 +57,7 @@ int perlin2d(float * grid, size_t height, size_t width, unsigned int t, float a,
         DOT(vec4, vgrid + (((y + 1) * vgridxl + x) * 2))
       };
 
-      // Interpolate
+      // Non-linear interpolation
       float avgt = LERP(dots[0], dots[1], SMOOTH((u - 1) / (t - 1)));
       float avgb = LERP(dots[3], dots[2], SMOOTH((u - 1) / (t - 1)));
       float val = LERP(avgt, avgb, SMOOTH((v - 1) / (t - 1)));
